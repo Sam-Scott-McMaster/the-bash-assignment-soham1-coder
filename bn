@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+usage()
+{
+    echo "bn <year> <assigned gender: f|F|m|M|b|B>" > &2
+
+    if [[ ! $# -eq 0 ]]
+    then
+        exit $1
+    fi
+}
+
+help()
+{
+
+}
+
+#Extracts name information and name count
+
+male_info = $(grep -E -i "^[a-z]+,[M],[1-9][0-9]*" "./us_baby_names/yob$1.txt")
+
+female_info = $(grep -E -i "^[a-z]+,[F],[1-9][0-9]*" "./us_baby_names/yob$1.txt")
+
+male_name_count = $(grep -i -E "^[a-z]+,[M],[1-9][0-9]*" "./us_baby_names/yob$1.txt" | wc -l | xargs)
+
+female_name_count = $(grep -i -E "^[a-z]+,[F],[1-9][0-9]*" "./us_baby_names/yob$1.txt" | wc -l | xargs)
+
+rank()
+{
+
+
+
+}
