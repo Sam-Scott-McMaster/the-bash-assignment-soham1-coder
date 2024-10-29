@@ -10,5 +10,55 @@
 ##########################################
 # EXAMPLE TEST CASES
 ##########################################
+test() {
+    tc=tc+1
 
+    local COMMAND=$1
+    local RETURN=$2
+	local STDIN=$3
+    local STDOUT=$4
+    local STDERR=$5
 
+    # CHECK RETURN VALUE
+    $COMMAND <<< "$STDIN" >/dev/null 2>/dev/null
+    local A_RETURN=$?
+
+    if [[ "$A_RETURN" != "$RETURN" ]]; then
+        echo "Test $tc Failed"
+        echo "   $COMMAND"
+        echo "   Expected Return: $RETURN"
+        echo "   Actual Return: $A_RETURN"
+        fails=$fails+1
+        return 1
+    fi
+
+    # CHECK STDOUT
+    local A_STDOUT=$($COMMAND <<< "$STDIN" 2>/dev/null)
+
+    if [[ "$STDOUT" != "$A_STDOUT" ]]; then
+        echo "Test $tc Failed"
+        echo "   $COMMAND"
+        echo "   Expected STDOUT: $STDOUT"
+        echo "   Actual STDOUT: $A_STDOUT"
+        fails=$fails+1
+        return 2
+    fi
+    
+    # CHECK STDERR
+    local A_STDERR=$($COMMAND <<< "$STDIN" 2>&1 >/dev/null)
+
+    if [[ "$STDERR" != "$A_STDERR" ]]; then
+        echo "Test $tc Failed"
+        echo "   $COMMAND"
+        echo "   Expected STDERR: $STDERR"
+        echo "   Actual STDERR: $A_STDERR"
+        fails=$fails+1
+        return 3
+    fi
+    
+    # SUCCESS
+    echo "Test $tc Passed"
+    return 0
+}
+
+test './bn 2022 m' 0 'Sam' '2022: Sam ranked 658 out of 14255 male names.' ''
