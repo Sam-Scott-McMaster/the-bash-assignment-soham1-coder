@@ -1,6 +1,8 @@
 #!/bin/bash
 
 
+
+
 usage()
 {
     echo "bn <year> <assigned gender: f|F|m|M|b|B>" > &2
@@ -16,19 +18,105 @@ help()
 
 }
 
-#Extracts name information and name count
+#Extracts name data and total name count
 
-male_info = $(grep -E -i "^[a-z]+,[M],[1-9][0-9]*" "./us_baby_names/yob$1.txt")
+male_data = $(grep -E -i "^[a-z]+,[M],[1-9][0-9]*" "./us_baby_names/yob$1.txt")
 
-female_info = $(grep -E -i "^[a-z]+,[F],[1-9][0-9]*" "./us_baby_names/yob$1.txt")
+female_data = $(grep -E -i "^[a-z]+,[F],[1-9][0-9]*" "./us_baby_names/yob$1.txt")
 
-male_name_count = $(grep -i -E "^[a-z]+,[M],[1-9][0-9]*" "./us_baby_names/yob$1.txt" | wc -l | xargs)
+male_name_total = $(grep -i -E "^[a-z]+,[M],[1-9][0-9]*" "./us_baby_names/yob$1.txt" | wc -l | xargs)
 
-female_name_count = $(grep -i -E "^[a-z]+,[F],[1-9][0-9]*" "./us_baby_names/yob$1.txt" | wc -l | xargs)
+female_name_total = $(grep -i -E "^[a-z]+,[F],[1-9][0-9]*" "./us_baby_names/yob$1.txt" | wc -l | xargs)
 
+
+#uses the name data to determine rank of each name
 rank()
 {
 
+#initializes variables
+total=0
+gender=""
+data=""
+rank=1
+found="False"
 
+if [[ $2 == "M" || $2 == "m" ]]
+then
 
+    gender="male"
+    total=$(male_name_total)
+    data=$male_data
+
+elif [[ $2 == "F" || $2 == "f" ]]  
+then
+
+    gender="female"
+    total=$(female_name_total)
+    data=$female_data
+
+fi
+
+while read line
+do
+
+    if echo "$line" | grep -i -E "^$1,[$2],[1-9][0-9]*" > /dev/null
+    then
+
+        found="True"
+        echo "$3: $1 ranked $rank out of $count $gender names."
+        break
+
+    else
+         rank=$((rank + 1))
+    fi    
+
+    done <<< "$data"
+
+    if [[ $found == "False" ]]
+    then
+
+        echo "$3: $1 not found in $gender names"
+
+    fi
 }
+
+#Read inputed names from each line
+while read names
+do
+
+    #Checks if all names are valid
+    for name in $names
+    do
+
+        #Invalid name
+        if [[ ! $name =~ ^[A-Za-z]+$ ]]
+        then
+
+            #Error message
+            echo "$name is a badly formatted name" >&2
+            exit 3
+
+        fi
+    done
+
+    #Searches for names in data
+    for name in $names
+    do
+
+        if [[ $2 == "M" || $2 == "m" ]]
+        then
+            rank $name "M" $1 
+
+        elif [[ $2 == "F" || $2 == "f" ]]
+        then
+            rank $name "F" $1
+
+        elif [[ $2 == "B" || $2 == "b" ]]
+        then
+            rank $name "M" $1
+            rank $name "F" $1
+
+        fi
+
+    done
+done
