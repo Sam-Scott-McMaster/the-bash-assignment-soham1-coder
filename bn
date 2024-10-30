@@ -84,7 +84,7 @@ if [[ $2 == "M" || $2 == "m" ]]
 then
 
     gender="male"
-    total=$(male_name_total)
+    total=$((male_name_total))
     data=$male_data
 
 elif [[ $2 == "F" || $2 == "f" ]]  
