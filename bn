@@ -103,7 +103,7 @@ do
     then
 
         found="True"
-        echo "$3: $1 ranked $rank out of $count $gender names."
+        echo "$3: $1 ranked $rank out of $total $gender names."
         break
 
     else
